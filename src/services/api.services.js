@@ -2,8 +2,8 @@ import axios from "axios";
 import requestHeader from "@/plugins/header.plugins";
 
 // const URL = import.meta.env.VITE_APP_API_BASEURL_DEV_LOCAL;
-// const URL = import.meta.env.VITE_APP_API_BASEURL;
-const URL = import.meta.env.VITE_APP_API_BASEURL_DEV;
+const URL = import.meta.env.VITE_APP_API_BASEURL;
+// const URL = import.meta.env.VITE_APP_API_BASEURL_DEV;
 class ApiService {
     // getMenuDigio(parentid) {
     //     return axios.post(URL + '/menu/get', {}, { headers: requestHeader('menu-digio', parentid) });
