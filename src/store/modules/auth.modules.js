@@ -20,6 +20,18 @@ export const auth = {
                 }
             )
         },
+        async loginIframe({ commit }, user) {
+            return authServices.loginIframe(user).then(
+                user => {
+                    commit("Login Success", user);
+                    return Promise.resolve(user);
+                },
+                error => {
+                    commit("Login Failed");
+                    return Promise.reject(error);
+                }
+            )
+        },
         logout({ commit }) {
             authServices.logout();
             commit("logout");

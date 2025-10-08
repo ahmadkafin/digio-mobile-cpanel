@@ -18,6 +18,7 @@ import vueDebounce from 'vue-debounce';
 
 axios.defaults.withCredentials = false;
 axios.defaults.baseURL = import.meta.env.VITE_APP_API_BASEURL;
+
 axios.interceptors.response.use(undefined, (error) => {
     if (error) {
         if (error.response.status === 401 || error.response.status === 403) {
@@ -37,7 +38,6 @@ axios.interceptors.response.use(undefined, (error) => {
         }
     }
 });
-
 
 const app = createApp(App)
 

@@ -67,7 +67,7 @@
 
         <div :class="['d-grid', 'gap-2', isLoading ? 'hide-button' : '']">
           <button class="btn btn-success btn-sm" :disabled="isLoading">Submit</button>
-          <div ref="googleBtn"></div>
+          <!-- <div ref="googleBtn"></div> -->
         </div>
       </div>
     </div>

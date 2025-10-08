@@ -124,7 +124,7 @@ export default {
           description:
             'Enable this to notify users when the app is under maintenance (applies on cold start).',
           color: '#2E5077',
-          images: 'no-screenshot',
+          images: 'maintenance',
           path: 'isMaintenance',
           type: 'checkbox',
           model: this.isMaintenance,

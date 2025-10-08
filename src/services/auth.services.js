@@ -16,6 +16,20 @@ class AuthService {
         })
     }
 
+    async loginIframe(data) {
+        return await axios.post(API_ENDPOINTS.iframeLogin, {}, {
+            headers: {
+                uuid: data,
+            }
+        }).then((response) => {
+            let data = response.data;
+            if (data.token) {
+                localStorage.setItem('userdata', JSON.stringify(data));
+            }
+            return data;
+        })
+    }
+
     logout() {
         localStorage.removeItem('userdata');
     }

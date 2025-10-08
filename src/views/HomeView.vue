@@ -22,7 +22,20 @@ export default {
       test: API_ENDPOINTS.login,
     }
   },
+  mounted() {
+    this.validToken()
+  },
   methods: {
+    validToken() {
+      apiServices
+        .validToken()
+        .then((r) => {
+          // this.$toast.success('token valid')
+        })
+        .catch((r) => {
+          this.$toast.error('token invalid')
+        })
+    },
     loadHome() {
       // apiServices.getMenu('0').then((response) => {
       //   console.log(response.data)

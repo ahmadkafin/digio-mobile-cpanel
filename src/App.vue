@@ -1,4 +1,15 @@
-<script setup></script>
+<script setup>
+import { onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+onMounted(() => {
+  console.log('Query params : ', route.query)
+
+  if (route.query.token) {
+  }
+})
+</script>
 
 <template>
   <RouterView />

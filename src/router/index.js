@@ -4,6 +4,8 @@ import HomeView from '@/views/HomeView.vue';
 import LoginView from '@/views/LoginView.vue';
 import ConfigView from '@/views/ConfigView.vue';
 import FormView from '@/views/FormView.vue';
+import apiServices from '@/services/api.services';
+import ToastPlugin, { useToast } from 'vue-toast-notification';
 
 const routes = [
   {
@@ -45,18 +47,34 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to) => {
-  const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
-  const guestOnly = to.matched.some(r => r.meta.guest)
-  const loggedIn = !!localStorage.getItem('userdata')
-  if (requiresAuth && !loggedIn) {
-    return { name: 'login', query: { redirect: to.fullPath } }
-  }
+router.beforeEach(async (to) => {
+  const uuid = to.query?.uuid;
+  if (uuid) {
+    const ref = document.referrer;
+    if (ref === "https://digio.pgn.co.id/") {
+      try {
+        await store.dispatch('loginIframe', uuid);
+        return { name: 'home' };
+      } catch (err) {
+        console.error('loginIframe failed', err);
+        return { name: 'login' };
+      }
+    } else {
+      useToast().error("hmmm... seems you're not on digio")
+    }
+  } else {
+    const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
+    const guestOnly = to.matched.some(r => r.meta.guest)
+    const loggedIn = !!localStorage.getItem('userdata')
 
-  if (guestOnly && loggedIn) {
-    return { name: 'home' }
-  }
+    if (requiresAuth && !loggedIn) {
+      return { name: 'login', query: { redirect: to.fullPath } }
+    }
 
+    if (guestOnly && loggedIn) {
+      return { name: 'home' }
+    }
+  }
 })
 
 export default router
