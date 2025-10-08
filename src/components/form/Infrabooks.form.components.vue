@@ -148,7 +148,7 @@ export default {
       imageFile: null,
       imagePreviewUrl: null,
       pdfError: null,
-      pdfBaseUrl: `${import.meta.env.VITE_APP_API_BASEUR}/static/doc`,
+      pdfBaseUrl: `${import.meta.env.VITE_APP_API_BASEURL}/static/doc`,
       imageBaseUrl: `${import.meta.env.VITE_APP_API_BASEURL}/static/images/infra`,
       type: this.$route.params.uuid,
       isSubmit: false,
