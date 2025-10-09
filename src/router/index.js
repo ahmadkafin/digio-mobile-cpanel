@@ -64,7 +64,8 @@ router.beforeEach(async (to) => {
       useToast().error("hmmm... seems you're not on digio")
     }
   } else {
-    window.location = 'https://digio.pgn.co.id/digio/pages/admin/mobilecpanel.aspx'
+    window.location.replace("https://digio.pgn.co.id/digio/pages/admin/mobilecpanel.aspx");
+    // window.location = 'https://digio.pgn.co.id/digio/pages/admin/mobilecpanel.aspx'
     // const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
     // const guestOnly = to.matched.some(r => r.meta.guest)
     // const loggedIn = !!localStorage.getItem('userdata')
