@@ -51,7 +51,7 @@ router.beforeEach(async (to) => {
   const uuid = to.query?.uuid;
   if (uuid) {
     const ref = document.referrer;
-    if (ref === "https://digio.pgn.co.id/") {
+    if (ref === "https://digio.pgn.co.id/digio/pages/admin/mobilecpanel.aspx") {
       try {
         await store.dispatch('loginIframe', uuid);
         return { name: 'home' };
