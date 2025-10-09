@@ -82,16 +82,16 @@ router.beforeEach(async (to) => {
       return;
     }
 
-    try {
-      window.top.location.replace(target);
-    } catch (err) {
-      try {
-        window.parent.postMessage({ type: 'redirect', url: target }, '*');
-      } catch (postErr) {
-        console.error('cannot postMessage to parent', postErr);
-        window.location.replace(target);
-      }
-    }
+    // try {
+    //   window.top.location.replace(target);
+    // } catch (err) {
+    //   try {
+    //     window.parent.postMessage({ type: 'redirect', url: target }, '*');
+    //   } catch (postErr) {
+    //     console.error('cannot postMessage to parent', postErr);
+    //     window.location.replace(target);
+    //   }
+    // }
   }
 })
 
