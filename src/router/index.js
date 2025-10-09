@@ -49,6 +49,7 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const uuid = to.query?.uuid;
+  console.log(document.referrer);
   if (uuid) {
     const ref = document.referrer;
     if (ref === "https://digio.pgn.co.id/digio/pages/admin/mobilecpanel.aspx") {
