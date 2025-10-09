@@ -48,6 +48,12 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
+
+  const contentMaster = window.parent.document.querySelector('#contentMaster');
+  if (contentMaster) {
+    contentMaster.style.overflowX = 'hidden';
+  }
+
   const uuid = to.query?.uuid;
   console.log(document.referrer);
   if (uuid) {
