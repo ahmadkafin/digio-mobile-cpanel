@@ -64,17 +64,18 @@ router.beforeEach(async (to) => {
       useToast().error("hmmm... seems you're not on digio")
     }
   } else {
-    const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
-    const guestOnly = to.matched.some(r => r.meta.guest)
-    const loggedIn = !!localStorage.getItem('userdata')
+    window.location = 'https://digio.pgn.co.id/digio/pages/admin/mobilecpanel.aspx'
+    // const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
+    // const guestOnly = to.matched.some(r => r.meta.guest)
+    // const loggedIn = !!localStorage.getItem('userdata')
 
-    if (requiresAuth && !loggedIn) {
-      return { name: 'login', query: { redirect: to.fullPath } }
-    }
+    // if (requiresAuth && !loggedIn) {
+    //   return { name: 'login', query: { redirect: to.fullPath } }
+    // }
 
-    if (guestOnly && loggedIn) {
-      return { name: 'home' }
-    }
+    // if (guestOnly && loggedIn) {
+    //   return { name: 'home' }
+    // }
   }
 })
 
