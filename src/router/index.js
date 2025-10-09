@@ -64,23 +64,23 @@ router.beforeEach(async (to) => {
       useToast().error("hmmm... seems you're not on digio")
     }
   } else {
-    const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
-    const guestOnly = to.matched.some(r => r.meta.guest)
-    const loggedIn = !!localStorage.getItem('userdata')
+    // const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
+    // const guestOnly = to.matched.some(r => r.meta.guest)
+    // const loggedIn = !!localStorage.getItem('userdata')
 
-    if (requiresAuth && !loggedIn) {
-      return { name: 'login', query: { redirect: to.fullPath } }
-    }
-
-    if (guestOnly && loggedIn) {
-      return { name: 'home' }
-    }
-
-    // const target = "https://digio.pgn.co.id/digio/pages/admin/mobilecpanel.aspx";
-    // if (window.top === window.self) {
-    //   window.location.replace(target);
-    //   return;
+    // if (requiresAuth && !loggedIn) {
+    //   return { name: 'login', query: { redirect: to.fullPath } }
     // }
+
+    // if (guestOnly && loggedIn) {
+    //   return { name: 'home' }
+    // }
+
+    const target = "https://digio.pgn.co.id/digio/pages/admin/mobilecpanel.aspx";
+    if (window.top === window.self) {
+      window.location.replace(target);
+      return;
+    }
 
     // try {
     //   window.top.location.replace(target);
