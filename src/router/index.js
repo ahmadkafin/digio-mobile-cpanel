@@ -64,8 +64,6 @@ router.beforeEach(async (to) => {
       useToast().error("hmmm... seems you're not on digio")
     }
   } else {
-    window.location.replace("https://digio.pgn.co.id/digio/pages/admin/mobilecpanel.aspx");
-    // window.location = 'https://digio.pgn.co.id/digio/pages/admin/mobilecpanel.aspx'
     // const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
     // const guestOnly = to.matched.some(r => r.meta.guest)
     // const loggedIn = !!localStorage.getItem('userdata')
@@ -77,6 +75,23 @@ router.beforeEach(async (to) => {
     // if (guestOnly && loggedIn) {
     //   return { name: 'home' }
     // }
+
+    const target = "https://digio.pgn.co.id/digio/pages/admin/mobilecpanel.aspx";
+    if (window.top === window.self) {
+      window.location.replace(target);
+      return;
+    }
+
+    try {
+      window.top.location.replace(target);
+    } catch (err) {
+      try {
+        window.parent.postMessage({ type: 'redirect', url: target }, '*');
+      } catch (postErr) {
+        console.error('cannot postMessage to parent', postErr);
+        window.location.replace(target);
+      }
+    }
   }
 })
 
