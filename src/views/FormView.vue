@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-3">
+  <div class="container py-4">
     <div class="card p-5 bg-dark">
       <h5 class="d-flex align-items-center gap-2 mb-3 flex-nowrap text-light">
         <span @click="goBack" class="goback-btn d-inline-flex align-items-center">
