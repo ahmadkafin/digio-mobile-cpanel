@@ -54,6 +54,6 @@ export default {
 
 .custom-nav-btn > .nav-link.active {
   background-color: rgb(231 152 0);
-  width: 100px;
+  min-width: 100px;
 }
 </style>

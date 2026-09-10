@@ -22,6 +22,7 @@ import {
     faTable,
     faTrash,
     faXmark,
+    faVideo,
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(
@@ -46,6 +47,7 @@ library.add(
     faChevronRight,
     faCircleCheck,
     faPeopleGroup,
+    faVideo,
 )
 
 export { FontAwesomeIcon }

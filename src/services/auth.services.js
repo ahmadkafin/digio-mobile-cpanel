@@ -16,17 +16,17 @@ class AuthService {
         })
     }
 
-    async loginIframe(data) {
+    async loginIframe(uuid) {
         return await axios.post(API_ENDPOINTS.iframeLogin, {}, {
             headers: {
-                uuid: data,
+                uuid: uuid,
             }
         }).then((response) => {
-            let data = response.data;
-            if (data.token) {
-                localStorage.setItem('userdata', JSON.stringify(data));
+            const responseData = response.data;
+            if (responseData.token) {
+                localStorage.setItem('userdata', JSON.stringify(responseData));
             }
-            return data;
+            return responseData;
         })
     }
 

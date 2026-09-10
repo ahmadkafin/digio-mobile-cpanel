@@ -8,14 +8,13 @@ export const auth = {
     state: initState,
     actions: {
         async login({ commit }, user) {
-            console.log("called");
             return authServices.login(user).then(
                 user => {
-                    commit("Login Success", user);
+                    commit('loginSuccess', user);
                     return Promise.resolve(user);
                 },
                 error => {
-                    commit("Login Failed");
+                    commit('loginFailed');
                     return Promise.reject(error);
                 }
             )
@@ -23,11 +22,11 @@ export const auth = {
         async loginIframe({ commit }, user) {
             return authServices.loginIframe(user).then(
                 user => {
-                    commit("Login Success", user);
+                    commit('loginSuccess', user);
                     return Promise.resolve(user);
                 },
                 error => {
-                    commit("Login Failed");
+                    commit('loginFailed');
                     return Promise.reject(error);
                 }
             )

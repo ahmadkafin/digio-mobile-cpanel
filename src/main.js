@@ -16,27 +16,23 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
 import vueDebounce from 'vue-debounce';
 
+import { BASE_API_URL } from '@/utils/baseUrl.utils';
+
 axios.defaults.withCredentials = false;
-axios.defaults.baseURL = import.meta.env.VITE_APP_API_BASEURL;
+axios.defaults.baseURL = BASE_API_URL;
 
 axios.interceptors.response.use(undefined, (error) => {
-    if (error) {
-        if (error.response.status === 401 || error.response.status === 403) {
-            store.dispatch('logout');
-            localStorage.removeItem('userdata');
-            return router.push("/login");
-        } else if (error.response.status === 404) {
-            return Promise.reject(error);
-        } else if (error.response.status === 400) {
-            return Promise.reject(error);
-        } else if (error.response.status === 409) {
-            return Promise.reject(error);
-        } else if (error.response.status === 413) {
-            return Promise.reject(error);
-        } else if (error.response.status === 500) {
-            return Promise.reject(error);
-        }
+    if (!error?.response) {
+        // Network error, CORS block, timeout — no response from server
+        return Promise.reject(error);
     }
+    const { status } = error.response;
+    if (status === 401 || status === 403) {
+        store.dispatch('logout');
+        localStorage.removeItem('userdata');
+        return router.push('/login');
+    }
+    return Promise.reject(error);
 });
 
 const app = createApp(App)

@@ -9,6 +9,7 @@
       :initial-values="formInit"
       ref="formInfrabook"
       class="form has-overlay"
+      @submit="submit"
     >
       <div class="overlay" v-show="loading">
         <div class="d-flex justify-content-center">
@@ -64,7 +65,7 @@
         <div class="row">
           <div class="col-6">
             <label class="form-label">File PDF</label>
-            <Field name="file_path" v-slot="{ meta, errors }">
+            <Field name="file_path" v-slot="{ meta }">
               <input
                 class="form-control"
                 type="file"
@@ -119,9 +120,7 @@
         </div>
 
         <div :class="['d-grid', 'gap-2']">
-          <button type="button" class="btn btn-success" @click="submit" :disabled="isSubmit">
-            Simpan
-          </button>
+          <button type="submit" class="btn btn-success" :disabled="isSubmit">Simpan</button>
         </div>
       </div>
     </Form>
@@ -134,6 +133,8 @@ import { Form, Field, ErrorMessage } from 'vee-validate'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import apiServices from '@/services/api.services'
+import { BASE_API_URL as baseUrl } from '@/utils/baseUrl.utils'
+
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker
 
 export default {
@@ -148,8 +149,8 @@ export default {
       imageFile: null,
       imagePreviewUrl: null,
       pdfError: null,
-      pdfBaseUrl: `${import.meta.env.VITE_APP_API_BASEURL}/static/doc`,
-      imageBaseUrl: `${import.meta.env.VITE_APP_API_BASEURL}/static/images/infra`,
+      pdfBaseUrl: `${baseUrl}/static/doc`,
+      imageBaseUrl: `${baseUrl}/static/images/infra`,
       type: this.$route.params.uuid,
       isSubmit: false,
       loading: false,
@@ -323,7 +324,7 @@ export default {
     },
 
     // ---------- Submit ----------
-    async submit({ resetForm }) {
+    async submit(values, { resetForm }) {
       this.loading = true
       const vals = this.$refs.formInfrabook.getValues()
       const fd = new FormData()
@@ -336,17 +337,6 @@ export default {
       } else {
         this.apiUpdate(fd, resetForm)
       }
-      // ==== DEBUG DI CONSOLE ====
-      console.group('FormData debug')
-      console.log('has image?', fd.has('poster_path'))
-      for (const [key, val] of fd.entries()) {
-        if (val instanceof File) {
-          console.log(`${key} = File{name:${val.name}, type:${val.type}, size:${val.size}}`)
-        } else {
-          console.log(`${key} =`, val)
-        }
-      }
-      console.groupEnd()
     },
 
     async apiAdd(data) {
@@ -362,7 +352,7 @@ export default {
           this.isSubmit = false
           this.loading = false
           const eMessage = `Error : ${e.response.data.status} - ${e.response.data.message}`
-          console.log(e)
+          // console.log(e)
           this.$toast.error(eMessage)
         })
     },
@@ -379,7 +369,7 @@ export default {
           this.isSubmit = false
           this.loading = false
           const eMessage = `Error : ${e.response.status} - ${e.response.data.code} - ${e.response.data.data}`
-          console.log(e)
+          // console.log(e)
           this.$toast.error(eMessage)
         })
     },

@@ -110,6 +110,7 @@ export default {
   flex-direction: column;
   justify-content: space-between;
 }
+
 .custom-card.products > .custom-card-body > .btn {
   background-color: rgb(234, 184, 92);
 }

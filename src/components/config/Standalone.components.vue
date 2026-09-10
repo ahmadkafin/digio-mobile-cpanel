@@ -35,7 +35,7 @@
                   v-model="groupName"
                 >
                   <option value="0" selected disabled>Select Entitas</option>
-                  <option :value="{ name: item.role }" v-for="item in groupedByRole">
+                  <option :value="{ name: item.role }" v-for="item in groupedByRole" :key="item">
                     {{ item.role }}
                   </option>
                 </select>
@@ -74,7 +74,11 @@
                   @change="fetchMenuData"
                 >
                   <option value="0" selected disabled>Select Menu</option>
-                  <option :value="{ name: item.name, uuid: item.uuid }" v-for="item in parentMenu">
+                  <option
+                    :value="{ name: item.name, uuid: item.uuid }"
+                    v-for="item in parentMenu"
+                    :key="item"
+                  >
                     {{ item.name }}
                   </option>
                 </select>
@@ -144,6 +148,8 @@ import { TabulatorFull as Tabulator } from 'tabulator-tables'
 import 'tabulator-tables/dist/css/tabulator.min.css'
 import TambahChildStandaloneModal from './modal/TambahChildStandalone.modal.vue'
 import CopyStandaloneModal from './modal/CopyStandalone.modal.vue'
+import { groupByRole } from '@/utils/groupByRole.utils'
+import { BASE_API_URL as baseUrl } from '@/utils/baseUrl.utils'
 
 export default {
   name: 'StandaloneComponents',
@@ -172,7 +178,7 @@ export default {
   },
   computed: {
     groupedByRole() {
-      return this.groupByRole(this.groupDigio)
+      return groupByRole(this.groupDigio)
     },
   },
   mounted() {
@@ -241,7 +247,7 @@ export default {
         .then((res) => {
           this.override = res.data.data
           this.override = this.override.filter((p) => p.url === '@standalone')
-          console.log(this.override)
+          // console.log(this.override)
         })
         .catch((e) => {
           if (e.response.data.status === 404) {
@@ -256,7 +262,7 @@ export default {
     },
     fetchMenuData() {
       apiServices
-        .getMenuStandAlone({
+        .getStandAlone({
           parent_menu_id: this.dropdownPMenu.uuid,
           name: this.groupName.name,
         })
@@ -287,12 +293,7 @@ export default {
             dataTreeStartExpanded: false,
             dataTreeChildField: 'children',
             tableBuilt: () => {
-              console.log('Tabulator tableBuilt event fired')
-            },
-            cellEdited: (cell) => {
-              console.log('CONFIG cellEdited ->', cell.getField(), cell.getValue())
-              // delegate ke method Vue
-              this.handleEdited(cell)
+              // Tabulator tree table is ready
             },
             columns: [
               {
@@ -312,7 +313,7 @@ export default {
                     }
                   } else {
                     return `
-                    <img src="https://digio.pgn.co.id/digiomobilebe/static/images/standalone/${url}" class="img-thumbnail" style="height:50px; width:auto; object-fit:contain;" />`
+                    <img src="${baseUrl}/static/images/standalone/${url}" class="img-thumbnail" style="height:50px; width:auto; object-fit:contain;" />`
                   }
                 },
                 width: 80,
@@ -468,6 +469,10 @@ export default {
                   btnDelete.className = 'btn btn-danger btn-sm'
                   btnDelete.innerText = 'Delete'
                   btnDelete.addEventListener('click', () => {
+                    const msg = data.has_child
+                      ? `Apakah anda akan menghapus menu "${data.name}"?\nSemua child menu juga akan terhapus.`
+                      : `Apakah anda akan menghapus menu "${data.name}"?`
+                    if (!confirm(msg)) return
                     row.delete()
                     this.deleteRow({
                       uuid: data.uuid,
@@ -485,22 +490,12 @@ export default {
             ],
           })
           this.tabulator.on('cellEdited', (cell) => {
-            console.log('ON event cellEdited ->', cell.getField(), cell.getValue())
-            // if (
-            //   cell.getField() !== 'url' ||
-            //   cell.getField() !== 'x' ||
-            //   cell.getField() !== 'y' ||
-            //   cell.getField() !== 'order_index'
-            // )
-            //   return
-            // delegate ke same method so we don't duplicate logic
             this.handleEdited(cell)
           })
-          console.log('Tabulator instance created:', this.tabulator)
         })
         .catch((e) => {
           const eMessage = `Error : ${e.response.data.status} - ${e.response.data.resp}`
-          this.menuData = ''
+          this.menuData = []
           this.$toast.error(eMessage)
         })
     },
@@ -509,7 +504,7 @@ export default {
       try {
         btnChild.disabled = true
         btnChild.textContent = 'Loading...'
-        const res = await apiServices.getMenuStandAlone({
+        const res = await apiServices.getStandAlone({
           parent_menu_id: uuid,
           name: this.groupName.name,
         })
@@ -529,66 +524,34 @@ export default {
       }
     },
     deleteRow(data) {
-      try {
-        apiServices.deleteMenuStandalone(data).then(() => {
+      apiServices
+        .deleteMenuStandalone(data)
+        .then(() => {
           this.$toast.success(`204 - Sukses menghapus ${data.name}`)
-          // this.fetchMenuData()
         })
-        // let cnfrm = confirm(
-        //   data.has_child
-        //     ? `Apakah anda akan menghapus menu ${data.name} ini? jika ya maka semua child akan terhapus`
-        //     : `Apakah anda akan menghapus menu ${data.name} ini?`,
-        // )
-        // if (cnfrm) {
-        //   apiServices.deleteMenuStandalone(data).then(() => {
-        //     this.$toast.success(`204 - Sukses menghapus ${data.name}`)
-        //     // this.fetchMenuData()
-        //   })
-        // }
-      } catch (e) {
-        const eMessage = `Error : ${e.response.data.status} - ${e.response.data.resp}`
-        this.$toast.error(eMessage)
-      }
+        .catch((e) => {
+          const eMessage = `Error : ${e.response.data.status} - ${e.response.data.resp}`
+          this.$toast.error(eMessage)
+        })
     },
     editRow(uuid) {
       alert(`edit  ${uuid}`)
-    },
-    groupByRole(rows) {
-      const norm = (s) =>
-        (s ?? '')
-          .toString()
-          .replace(/\u00A0/g, ' ')
-          .trim()
-          .replace(/\s+/g, ' ')
-      const map = new Map()
-      for (const r of rows) {
-        const role = norm(r.role)
-        const name = norm(r.groupNames)
-        if (!role) continue // skip kalau role kosong
-        if (!map.has(role)) map.set(role, new Set())
-        if (name) map.get(role).add(name) // dedup nama group
-      }
-      return Array.from(map, ([role, names]) => ({
-        role,
-        groupNames: Array.from(names).sort(),
-        count: names.size,
-      }))
     },
     handleEdited(cell) {
       // Get the full data object for the row that was edited
       const updatedRowData = cell.getRow().getData()
 
       // Log the entire row data to the console
-      console.log('Row updated:', updatedRowData)
+      // console.log('Row updated:', updatedRowData)
 
       // Access specific values like uuid
       const { uuid, name, url, x, y, order_index } = updatedRowData
-      console.log(`Edited row UUID: ${uuid}`)
-      console.log(`Edited name: ${name}`)
-      console.log(`Edited progress: ${url}`)
-      console.log(`Edited progress: ${x}`)
-      console.log(`Edited progress: ${y}`)
-      console.log(`Edited progress: ${order_index}`)
+      // console.log(`Edited row UUID: ${uuid}`)
+      // console.log(`Edited name: ${name}`)
+      // console.log(`Edited progress: ${url}`)
+      // console.log(`Edited progress: ${x}`)
+      // console.log(`Edited progress: ${y}`)
+      // console.log(`Edited progress: ${order_index}`)
 
       apiServices
         .updateStandalone({

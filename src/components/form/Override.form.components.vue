@@ -406,7 +406,7 @@ export default {
       this.loading = true
       data.is_document = this.isDocument
       data.is_override_by_parent = this.isBasedOnParentId
-      console.log(data)
+      // console.log(data)
       apiServices
         .createOverride(data)
         .then((res) => {

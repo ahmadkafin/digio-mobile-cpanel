@@ -1,13 +1,12 @@
 <template>
-  <div class="container">
-    <div class="position-relative page-wrap">
-      <img
-        src="@@/assets/images/new_icon_new_font.png"
-        alt="logo"
-        class="rounded mx-auto d-block custom-image"
-      />
-      <FormComponent @submitData="submitData($event)" :isLoading="isLoading" />
-    </div>
+  <div class="container d-flex flex-column justify-content-center align-items-center page-wrap">
+    <img src="/assets/images/new_icon_new_font.png" alt="logo" class="rounded custom-image mb-4" />
+    <FormComponent
+      @submitData="submitData($event)"
+      :isLoading="isLoading"
+      class="w-100"
+      style="max-width: 400px"
+    />
   </div>
 </template>
 
@@ -45,26 +44,11 @@ export default {
 
 <style scoped>
 .page-wrap {
-  min-height: 100dvh;
+  min-height: 100%;
 }
 
 .custom-image {
-  width: clamp(140px, 40vw, 260px);
-  margin-top: 4dvh;
-  width: 80%;
-}
-
-@media (min-width: 768px) {
-  .custom-image {
-    width: clamp(160px, 24vw, 300px);
-    margin-top: 5dvh;
-  }
-}
-
-@media (min-width: 1024px) {
-  .custom-image {
-    width: clamp(180px, 16vw, 320px);
-    margin-top: 6dvh;
-  }
+  width: 200px;
+  max-width: 80%;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-3">
+  <div class="container py-4">
     <div class="card p-5 bg-dark">
       <div class="d-flex justify-content-between mb-3">
         <h5 class="d-flex align-items-center gap-2 mb-3 flex-nowrap text-light">
@@ -124,7 +124,7 @@ export default {
       this.$router.back()
     },
     goTo(param) {
-      console.log(param)
+      // console.log(param)
       this.$router.push({ name: 'form', params: { path: this.param, uuid: param } })
     },
     searchData(value) {
@@ -138,7 +138,7 @@ export default {
             this.infrabooks = this.allInfrabooks.slice()
             return
           case this.param === 'standalone':
-            this.infrabooks = this.allStandalone.slice()
+            this.standalone = this.allStandalone.slice()
             return
           default:
             return

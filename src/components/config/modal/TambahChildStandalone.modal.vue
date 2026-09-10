@@ -274,6 +274,7 @@ export default {
       parent_menus: [],
       idHasChild: `btnIfHaveChild-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       isLoading: false,
+      previewUrl: '',
     }
   },
   computed: {
@@ -341,9 +342,9 @@ export default {
     },
     changeUrlToNative() {
       const isNative = this.$refs.formChildStandalone.getValues()
-      console.log(isNative.menu_type)
+      // console.log(isNative.menu_type)
       if (isNative.menu_type === '@native') {
-        console.log('rendererd ')
+        // console.log('rendererd ')
         this.$refs.formChildStandalone.setFieldValue('url', '@native')
         this.is_native = true
       } else if (isNative.menu_type === '@webview' && this.is_parent) {
@@ -355,6 +356,10 @@ export default {
     },
     revokeBlob() {
       if (this.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(this.previewUrl)
+    },
+    setInitialPreview() {
+      // No pre-existing image for new child menus — clear the preview
+      this.previewUrl = ''
     },
     createMenuChild(data, { resetForm }) {
       const fData = new FormData()
@@ -396,12 +401,12 @@ export default {
 
       // ==== DEBUG DI CONSOLE ====
       // console.group('FormData debug')
-      // console.log('has image?', fData.has('image'))
+      // // console.log('has image?', fData.has('image'))
       // for (const [key, val] of fData.entries()) {
       //   if (val instanceof File) {
-      //     console.log(`${key} = File{name:${val.name}, type:${val.type}, size:${val.size}}`)
+      //     // console.log(`${key} = File{name:${val.name}, type:${val.type}, size:${val.size}}`)
       //   } else {
-      //     console.log(`${key} =`, val)
+      //     // console.log(`${key} =`, val)
       //   }
       // }
       // console.groupEnd()
@@ -409,7 +414,7 @@ export default {
     changeIsChild() {
       this.is_child = !this.is_child
       if (!this.is_child) {
-        console.log('render')
+        // console.log('render')
         this.$refs.formChildStandalone.setFieldValue('menu_name', this.menu_name)
         this.$refs.formChildStandalone.setFieldValue('menu_uuid', this.menu_uuid)
         this.$refs.formChildStandalone.setFieldValue('linked_to', '0')
@@ -431,7 +436,7 @@ export default {
     },
     loadParentMenus() {
       apiServices
-        .getMenuStandAlone({
+        .getStandAlone({
           parent_menu_id: this.menu_uuid,
           name: this.group_name,
         })

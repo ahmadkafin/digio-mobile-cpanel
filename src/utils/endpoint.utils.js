@@ -1,5 +1,5 @@
-const baseUrl = import.meta.env.VITE_APP_API_BASEURL;
-const baseUrlDevServer = import.meta.env.VITE_APP_API_BASEURL_DEV;
+import { BASE_API_URL as baseUrl } from '@/utils/baseUrl.utils';
+
 export const API_ENDPOINTS = {
     login: `${baseUrl}/auth/login`,
     iframeLogin: `${baseUrl}/auth/loginIframe`

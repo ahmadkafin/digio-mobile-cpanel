@@ -68,6 +68,8 @@ import apiServices from '@/services/api.services'
 import { TabulatorFull as Tabulator } from 'tabulator-tables'
 import 'tabulator-tables/dist/css/tabulator.min.css'
 import TambahFieldMapModal from './modal/TambahFieldMap.modal.vue'
+import { groupByRole } from '@/utils/groupByRole.utils'
+import { BASE_API_URL as baseUrl } from '@/utils/baseUrl.utils'
 
 export default {
   name: 'FieldMapComponents',
@@ -88,7 +90,7 @@ export default {
   },
   computed: {
     groupedByRole() {
-      return this.groupByRole(this.groupDigio)
+      return groupByRole(this.groupDigio)
     },
   },
   mounted() {
@@ -139,7 +141,7 @@ export default {
                     }
                   } else {
                     return `
-                    <img src="https://digio.pgn.co.id/digiomobilebe/dev/static/images/fieldmap/${url}" class="img-thumbnail" style="height:50px; width:auto; object-fit:contain;" />`
+                    <img src="${baseUrl}/static/images/fieldmap/${url}" class="img-thumbnail" style="height:50px; width:auto; object-fit:contain;" />`
                   }
                 },
                 width: 80,
@@ -160,27 +162,6 @@ export default {
           this.groupMenus = []
           this.$toast.error(eMessage)
         })
-    },
-    groupByRole(rows) {
-      const norm = (s) =>
-        (s ?? '')
-          .toString()
-          .replace(/\u00A0/g, ' ')
-          .trim()
-          .replace(/\s+/g, ' ')
-      const map = new Map()
-      for (const r of rows) {
-        const role = norm(r.role)
-        const name = norm(r.groupNames)
-        if (!role) continue // skip kalau role kosong
-        if (!map.has(role)) map.set(role, new Set())
-        if (name) map.get(role).add(name) // dedup nama group
-      }
-      return Array.from(map, ([role, names]) => ({
-        role,
-        groupNames: Array.from(names).sort(),
-        count: names.size,
-      }))
     },
     generateGroupNames() {
       const roles = [
@@ -248,7 +229,7 @@ export default {
         })
         .catch((e) => {
           this.loadingGroup = false
-          const eMessage = `Error : ${error.response.data.status} - ${e.response.data.message}`
+          const eMessage = `Error : ${e.response.data.status} - ${e.response.data.message}`
           this.$toast.error(eMessage)
         })
     },
@@ -265,7 +246,7 @@ export default {
         })
         .catch((e) => {
           this.loadingGroup = false
-          const eMessage = `Error : ${error.response.data.status} - ${e.response.data.message}`
+          const eMessage = `Error : ${e.response.data.status} - ${e.response.data.message}`
           this.$toast.error(eMessage)
         })
     },

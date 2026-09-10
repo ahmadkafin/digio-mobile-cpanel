@@ -1,9 +1,7 @@
 import axios from "axios";
 import requestHeader from "@/plugins/header.plugins";
 
-// const URL = import.meta.env.VITE_APP_API_BASEURL_DEV_LOCAL;
-const URL = import.meta.env.VITE_APP_API_BASEURL;
-// const URL = import.meta.env.VITE_APP_API_BASEURL_DEV;
+import { BASE_API_URL as URL } from '@/utils/baseUrl.utils';
 class ApiService {
     // getMenuDigio(parentid) {
     //     return axios.post(URL + '/menu/get', {}, { headers: requestHeader('menu-digio', parentid) });
@@ -64,7 +62,7 @@ class ApiService {
         return axios.post(URL + '/infrabook/update', data, { headers: requestHeader('infrabooks') })
     }
     deleteInfra(uuid) {
-        return axios.post(URL + '/infrabook/delete', { uuid: uuid }, { headers: requestHeader('products') });
+        return axios.post(URL + '/infrabook/delete', { uuid: uuid }, { headers: requestHeader('infrabooks') });
     }
 
     // standalone
@@ -83,9 +81,7 @@ class ApiService {
     createStandAlone(data) {
         return axios.post(URL + '/standalone/create', data, { headers: requestHeader('standalone') });
     }
-    getMenuStandAlone(data) {
-        return axios.post(URL + '/standalone/get', data, { headers: requestHeader('standalone') });
-    }
+
     getMenuDigio(data) {
         return axios.post(URL + '/menu/get', {}, { headers: requestHeader('menu-digio', data) })
     }
@@ -98,7 +94,6 @@ class ApiService {
     updateStandalone(data) {
         return axios.post(URL + '/standalone/update', data, { headers: requestHeader('standalone') });
     }
-
 
 
     // override
@@ -131,6 +126,29 @@ class ApiService {
     deleteGroupFieldMap(data) {
         return axios.post(URL + '/fieldmap/deleteFieldMapGroup', data, { headers: requestHeader('standalone') })
     }
+
+    // api for products video
+    getProductsCategories() {
+        return axios.get(URL + '/products/video/categories', { headers: requestHeader('products-video') });
+    }
+
+    fetchVideoFeed(query, videoName) {
+        let q = `page=${query.page}&paginate=${query.paginate}&orderBy=${query.orderBy}&sortBy=${query.sortBy}&productId=${query.productId}&videoname=${videoName}`
+        return axios.get(URL + '/products/video/feed?' + q, { headers: requestHeader('products-video') });
+    }
+
+    createVideo(data) {
+        return axios.post(URL + '/products/video', data, { headers: requestHeader('add-video') });
+    }
+
+    updateVideo(id, data) {
+        return axios.patch(URL + `/products/video/${id}`, data, { headers: requestHeader('add-video') });
+    }
+
+    deleteVideo(id) {
+        return axios.delete(URL + `/products/video/${id}`, { headers: requestHeader('add-video') });
+    }
+
 
 }
 

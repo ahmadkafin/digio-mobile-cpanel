@@ -124,7 +124,12 @@ export default {
         })
     },
     fetchOverride() {
-      console.log('override')
+      // TODO: Implement fetchOverride if/when the override edit form is built
+    },
+    fetchStandAlone() {
+      // TODO: Standalone editing is handled via the StandaloneComponents table.
+      // Add data-loading logic here if a dedicated standalone edit form is added.
+      this.subtitle = 'Edit'
     },
   },
 }

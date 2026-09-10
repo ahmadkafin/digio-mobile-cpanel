@@ -67,7 +67,7 @@
           </Field>
         </div>
 
-        <div class="col-6">
+        <div class="col-4">
           <Field name="name" v-slot="{ field, meta, errors }">
             <input
               v-bind="field"
@@ -86,7 +86,29 @@
           </Field>
         </div>
 
-        <div class="col-6">
+        <div class="col-4">
+          <Field name="isYoutube" type="checkbox" :value="true" v-slot="{ field, meta, errors }">
+            <input
+              v-bind="field"
+              type="checkbox"
+              class="btn-check"
+              id="isYoutube"
+              :class="{
+                'is-invalid': meta.touched && meta.invalid,
+                'is-valid': meta.touched && meta.valid,
+              }"
+              @change="handleChangeEventIsYoutube($event, field.onChange)"
+            />
+            <label class="btn btn-outline-warning d-grid" for="isYoutube">
+              is video from Youtube?
+            </label>
+            <small v-if="meta.touched && errors.length" class="text-danger d-block mt-1">
+              {{ errors[0] }}
+            </small>
+          </Field>
+        </div>
+
+        <div class="col-4" v-if="isFromYoutube">
           <Field name="video" v-slot="{ field, meta, errors }">
             <input
               v-bind="field"
@@ -105,8 +127,29 @@
           </Field>
         </div>
 
+        <div class="col-4" v-else>
+          <Field name="video" v-slot="{ field, meta, errors }">
+            <input
+              ref="videoInput"
+              type="file"
+              class="form-control"
+              id="video"
+              placeholder="File Video"
+              accept="video/*"
+              @change="onVideoInputChange($event, field)"
+              :class="{
+                'is-invalid': meta.touched && meta.invalid,
+                'is-valid': meta.touched && meta.valid,
+              }"
+            />
+            <small v-if="meta.touched && errors[0]" class="text-danger">
+              {{ errors[0] }}
+            </small>
+          </Field>
+        </div>
+
         <div class="col-12 mt-4 mb-5">
-          <Field name="description" v-slot="{ field, meta, errors }">
+          <Field name="description" v-slot="{ field, meta }">
             <div :class="['quill-wrap', { 'is-invalid': meta.touched && meta.invalid }]">
               <QuillEditor
                 :key="quilProductsKey"
@@ -132,13 +175,8 @@ import apiServices from '@/services/api.services'
 import { QuillEditor } from '@vueup/vue-quill'
 import { Form, ErrorMessage, Field } from 'vee-validate'
 import * as yup from 'yup'
-
-const escapeHtml = (s) =>
-  String(s ?? '').replace(
-    /[&<>"']/g,
-    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
-  )
-const looksLikeHtml = (s) => /<\/?[a-z][\s\S]*>/i.test(s ?? '')
+import { escapeHtml, looksLikeHtml, legacyToHtml } from '@/utils/html.utils'
+import { BASE_API_URL as baseUrl } from '@/utils/baseUrl.utils'
 
 export default {
   name: 'ProductsFormComponents',
@@ -167,7 +205,11 @@ export default {
         uid: this.product?.uid ?? '',
         name: this.product?.name ?? '',
         video: this.product?.video && this.product.video !== 'null' ? this.product.video : '',
-        description: this.legacyToHtml(this.product?.description ?? ''),
+        description: legacyToHtml(this.product?.description ?? ''),
+        isYoutube:
+          this.product?.video && this.product.video != 'null'
+            ? this.product.video.includes('https://yt.be')
+            : false,
         image: null,
       }
     },
@@ -179,6 +221,7 @@ export default {
       isSubmit: false,
       loading: false,
       quilProductsKey: 0,
+      isFromYoutube: false,
     }
   },
   methods: {
@@ -186,9 +229,17 @@ export default {
       this.revokeBlob()
       const img = this.product?.image
       if (img && img !== 'null') {
-        this.previewUrl = `https://digio.pgn.co.id/digiomobilebe/static/images/products/${img}`
+        this.previewUrl = `${baseUrl}/static/images/products/${img}`
       } else {
         this.previewUrl = ''
+      }
+    },
+    onVideoInputChange(e, field) {
+      const file = e.target.files?.[0]
+      if (file) {
+        field.onChange(file)
+      } else {
+        field.onChange(null)
       }
     },
     onFileChange(e, field) {
@@ -205,37 +256,6 @@ export default {
     },
     revokeBlob() {
       if (this.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(this.previewUrl)
-    },
-    legacyToHtml(raw) {
-      if (!raw) return ''
-      if (looksLikeHtml(raw)) return raw // kalau sudah HTML, langsung pakai
-
-      const text = raw.replace(/\\n/g, '\n') // jika \n masih escaped
-      const lines = text.split('\n')
-
-      let html = ''
-      let inList = false
-
-      for (const line of lines) {
-        const t = line.trim()
-        const bul = t.match(/^<bul>\s*(.*)$/i) // marker bullet
-        if (bul) {
-          if (!inList) {
-            html += '<ul>'
-            inList = true
-          }
-          html += `<li>${escapeHtml(bul[1])}</li>`
-        } else {
-          if (inList) {
-            html += '</ul>'
-            inList = false
-          }
-          if (t) html += `<p>${escapeHtml(t)}</p>`
-          else html += '<p><br></p>' // baris kosong
-        }
-      }
-      if (inList) html += '</ul>'
-      return html
     },
     async submit(data, { resetForm }) {
       const fData = new FormData()
@@ -256,12 +276,12 @@ export default {
 
       // ==== DEBUG DI CONSOLE ====
       //   console.group('FormData debug')
-      //   console.log('has image?', fData.has('image'))
+      //   // console.log('has image?', fData.has('image'))
       //   for (const [key, val] of fData.entries()) {
       //     if (val instanceof File) {
-      //       console.log(`${key} = File{name:${val.name}, type:${val.type}, size:${val.size}}`)
+      //       // console.log(`${key} = File{name:${val.name}, type:${val.type}, size:${val.size}}`)
       //     } else {
-      //       console.log(`${key} =`, val)
+      //       // console.log(`${key} =`, val)
       //     }
       //   }
       //   console.groupEnd()
@@ -284,7 +304,7 @@ export default {
           this.isSubmit = false
           this.loading = false
           const eMessage = `Error : ${e.response.data.status} - ${e.response.data.message}`
-          console.log(e)
+          // console.log(e)
           this.$toast.error(eMessage)
         })
     },
@@ -301,9 +321,14 @@ export default {
           this.isSubmit = false
           this.loading = false
           const eMessage = `Error : ${e.response.data.status} - ${e.response.data.message}`
-          console.log(e)
+          // console.log(e)
           this.$toast.error(eMessage)
         })
+    },
+    handleChangeEventIsYoutube(event, vValidateOnChange) {
+      vValidateOnChange(event)
+      const isChecked = event.target.checked
+      this.isFromYoutube = isChecked
     },
   },
   beforeUnmount() {

@@ -129,7 +129,7 @@ export default {
         .then((response) => {
           this.menus = response.data.data
         })
-        .catch((error) => {
+        .catch((e) => {
           const eMessage = `Error : ${e.response.data.status} - ${e.response.data.resp}`
           this.parentMenu = []
           this.$toast.error(eMessage)
@@ -140,7 +140,7 @@ export default {
       this.menu_uuid = this.$refs['copy-standalone-form'].values.menu
       this.isLoading = true
       apiServices
-        .getMenuStandAlone({
+        .getStandAlone({
           parent_menu_id: this.menu_uuid.uuid,
           name: this.group_name,
         })

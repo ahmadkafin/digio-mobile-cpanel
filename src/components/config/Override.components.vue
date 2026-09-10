@@ -40,7 +40,6 @@
                   <font-awesome-icon :icon="['fas', 'xmark-circle']" class="text-danger" />
                 </td>
                 <td class="text-center">
-                  <span class="badge bg-info mx-1">update</span>
                   <span
                     class="badge bg-danger mx-1"
                     style="cursor: pointer"

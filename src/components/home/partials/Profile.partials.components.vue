@@ -150,7 +150,7 @@ export default {
     submitToServer(item) {
       if (item.path === 'version') {
         if (this.version === '' || this.version === null) {
-          alert('Version cannot be empty!')
+          this.$toast.error('Version cannot be empty!')
         } else {
           this.apiCall({
             currentVersion: this.version,

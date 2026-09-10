@@ -163,6 +163,7 @@ export default {
       picked: null,
       isOverrideFromDigio: false,
       isLoading: false,
+      previewUrl: '',
     }
   },
   methods: {
@@ -181,6 +182,10 @@ export default {
     },
     revokeBlob() {
       if (this.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(this.previewUrl)
+    },
+    setInitialPreview() {
+      // No pre-existing image for new field map entries — clear the preview
+      this.previewUrl = ''
     },
     changeBaseOnDigio() {
       this.isOverrideFromDigio = !this.isOverrideFromDigio

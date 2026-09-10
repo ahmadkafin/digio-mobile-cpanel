@@ -6,7 +6,7 @@
   >
     <div class="position-absolute top-50 start-50 translate-middle login-wrapper">
       <div class="mb-3">
-        <Field name="directory" v-slot="{ field, meta, errors }">
+        <Field name="directory" v-slot="{ field, meta }">
           <select
             id="directory"
             class="form-select"
@@ -49,10 +49,6 @@
             placeholder="Password"
             class="form-control"
             v-bind="field"
-            :class="{
-              'is-invalid': meta.touched && meta.invalid,
-              'is-valid': meta.touched && meta.valid,
-            }"
           />
           <small v-if="meta.touched && errors[0]" class="text-danger">
             {{ errors[0] }}
@@ -85,30 +81,28 @@ export default {
   },
   props: ['isLoading'],
   mounted() {
-    const waitGoogle = () =>
-      new Promise((res) => {
-        if (window.google?.accounts?.id) return res()
-        const i = setInterval(() => {
-          if (window.google?.accounts?.id) {
-            clearInterval(i)
-            res()
-          }
-        }, 50)
-      })
-
-    waitGoogle().then(() => {
-      window.google.accounts.id.initialize({
-        client_id: this.gSignId,
-        callback: this.handleCredentialResponse,
-        ux_mode: 'popup',
-      })
-      window.google.accounts.id.renderButton(
-        this.$refs.googleBtn,
-        { theme: 'outline', size: 'large', type: 'standard' }, // opsi tombol
-      )
-      // Optional: One Tap
-      // window.google.accounts.id.prompt()
-    })
+    // Google Sign-In is currently disabled in the UI.
+    // Uncomment the <div ref="googleBtn"> in the template and this block
+    // when re-enabling SSO, then restore the Google SDK initialization below:
+    //
+    // const waitGoogle = () =>
+    //   new Promise((res) => {
+    //     if (window.google?.accounts?.id) return res()
+    //     const i = setInterval(() => {
+    //       if (window.google?.accounts?.id) { clearInterval(i); res() }
+    //     }, 50)
+    //   })
+    // waitGoogle().then(() => {
+    //   window.google.accounts.id.initialize({
+    //     client_id: this.gSignId,
+    //     callback: this.handleCredentialResponse,
+    //     ux_mode: 'popup',
+    //   })
+    //   window.google.accounts.id.renderButton(
+    //     this.$refs.googleBtn,
+    //     { theme: 'outline', size: 'large', type: 'standard' },
+    //   )
+    // })
   },
   data() {
     const schema = yup.object().shape({

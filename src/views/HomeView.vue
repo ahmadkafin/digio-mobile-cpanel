@@ -1,9 +1,11 @@
 <template>
-  <div class="container mt-3">
-    <div class="card p-5 bg-dark">
-      <div class="d-flex align-items-start">
-        <SideMenuComponents @callHome="loadHome" @callProfile="loadProfile" />
-        <BodyComponents />
+  <div class="d-flex justify-content-center align-items-center min-vh-100 py-5">
+    <div class="container">
+      <div class="card p-5 bg-dark custom-bg-card-home shadow-lg">
+        <div class="d-flex align-items-start">
+          <SideMenuComponents @callHome="loadHome" @callProfile="loadProfile" />
+          <BodyComponents />
+        </div>
       </div>
     </div>
   </div>
@@ -13,15 +15,9 @@
 import BodyComponents from '@/components/home/Body.components.vue'
 import SideMenuComponents from '@/components/home/SideMenu.components.vue'
 import apiServices from '@/services/api.services'
-import { API_ENDPOINTS } from '@/utils/endpoint.utils'
 export default {
   name: 'HomeView',
   components: { SideMenuComponents, BodyComponents },
-  data() {
-    return {
-      test: API_ENDPOINTS.login,
-    }
-  },
   mounted() {
     this.validToken()
   },
@@ -50,7 +46,7 @@ export default {
 }
 </script>
 <style scoped>
-.custom-bg-card-home {
-  background-color: black !important;
-}
+/* .custom-bg-card-home {
+  background-color: blue !important;
+} */
 </style>

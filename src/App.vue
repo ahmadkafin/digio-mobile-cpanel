@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 onMounted(() => {
-  console.log('Query params : ', route.query)
+  // console.log('Query params : ', route.query)
 
   if (route.query.token) {
   }
@@ -16,10 +16,21 @@ onMounted(() => {
 </template>
 
 <style>
+/* Iframe-safe root sizing:
+   - min-height: 100% instead of 100dvh (dvh = 0 in fixed-height iframes)
+   - background-attachment: scroll instead of fixed (fixed renders vs browser viewport, broken in iframes)
+   - No overflow: hidden — it clips Bootstrap toasts and modal backdrops
+*/
+html,
+body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
 #app {
-  min-height: 100dvh;
-  background: url('/assets/images/bg_first.png') center/cover no-repeat fixed;
-  overflow: hidden;
+  min-height: 100vh;
+  background: url('/assets/images/bg_first.png') center/cover no-repeat scroll;
 }
 
 .fixed-img {
@@ -53,10 +64,6 @@ onMounted(() => {
 
 .list-group-item {
   cursor: pointer;
-  background-color: rgb(231 152 0) !important;
-}
-
-.list-group-item {
   background-color: aliceblue !important;
 }
 
