@@ -41,7 +41,26 @@
         </Field>
       </div>
 
-      <div class="mb-3">
+      <div class="mb-3" v-if="isTokenEnv">
+        <Field name="token" v-slot="{ field, meta, errors }">
+          <input
+            type="text"
+            id="token"
+            placeholder="JWT Token"
+            class="form-control"
+            v-bind="field"
+            :class="{
+              'is-invalid': meta.touched && meta.invalid,
+              'is-valid': meta.touched && meta.valid,
+            }"
+          />
+          <small v-if="meta.touched && errors[0]" class="text-danger">
+            {{ errors[0] }}
+          </small>
+        </Field>
+      </div>
+
+      <div class="mb-3" v-else>
         <Field name="password" v-slot="{ field, meta, errors }">
           <input
             type="password"
@@ -105,15 +124,20 @@ export default {
     // })
   },
   data() {
+    const env = import.meta.env.VITE_APP_ENVIRONMENT
+    const isTokenEnv = env === 'DEV' || env === 'STAG'
     const schema = yup.object().shape({
       username: yup.string().required('Username is required'),
-      password: yup.string().required('Password is required'),
+      ...(isTokenEnv
+        ? { token: yup.string().required('JWT Token is required') }
+        : { password: yup.string().required('Password is required') }),
       directory: yup.string().oneOf(['pertamina', 'pgasol']).required('Directory is required'),
     })
     return {
       loading: false,
       messages: '',
       schema,
+      isTokenEnv,
       username: '',
       gSignId: import.meta.env.VITE_APP_G_CLIENT_ID,
     }

@@ -35,11 +35,17 @@
         :isLoading="isLoading"
         :override="override"
       />
+      <NoticesFormComponents
+        v-if="path === 'notices'"
+        :isLoading="isLoading"
+        :notice="notice"
+      />
     </div>
   </div>
 </template>
 <script>
 import InfrabooksFormComponents from '@/components/form/Infrabooks.form.components.vue'
+import NoticesFormComponents from '@/components/form/Notices.form.components.vue'
 import OverrideFormComponents from '@/components/form/Override.form.components.vue'
 import ProductsFormComponents from '@/components/form/Products.form.components.vue'
 import StandaloneFormComponents from '@/components/form/Standalone.form.components.vue'
@@ -52,6 +58,7 @@ export default {
     InfrabooksFormComponents,
     StandaloneFormComponents,
     OverrideFormComponents,
+    NoticesFormComponents,
   },
   data() {
     return {
@@ -63,6 +70,7 @@ export default {
       infrabook: '',
       standalone: '',
       override: '',
+      notice: null,
       isLoading: false,
     }
   },
@@ -81,6 +89,9 @@ export default {
           break
         case this.path === 'overridedigio':
           this.fetchOverride()
+          break
+        case this.path === 'notices':
+          this.fetchNotice()
           break
         default:
           null
@@ -130,6 +141,40 @@ export default {
       // TODO: Standalone editing is handled via the StandaloneComponents table.
       // Add data-loading logic here if a dedicated standalone edit form is added.
       this.subtitle = 'Edit'
+    },
+    fetchNotice() {
+      this.subtitle = 'Edit'
+      const stateNotice = window.history.state?.notice
+      if (stateNotice && String(stateNotice.id) === String(this.uuid)) {
+        this.notice = stateNotice
+        this.subtitle = stateNotice.captions || 'Edit Notice'
+        return
+      }
+      this.isLoading = true
+      apiServices
+        .getNotices({ page: 1, paginate: 100 })
+        .then((res) => {
+          this.isLoading = false
+          const raw = res.data?.data ?? res.data
+          const list = Array.isArray(raw)
+            ? raw
+            : Array.isArray(raw?.docs)
+              ? raw.docs
+              : raw && typeof raw === 'object' && raw.id
+                ? [raw]
+                : []
+          const found = list.find((n) => String(n.id) === String(this.uuid))
+          if (found) {
+            this.notice = found
+            this.subtitle = found.captions || 'Edit Notice'
+          }
+        })
+        .catch((e) => {
+          this.isLoading = false
+          const status = e.response?.data?.status || e.response?.status || 500
+          const msg = e.response?.data?.message || e.response?.data?.data || e.message
+          this.$toast.error(`Error : ${status} - ${msg}`)
+        })
     },
   },
 }

@@ -58,6 +58,20 @@
       />
 
       <FieldMapComponents v-if="param === 'fieldmap'" />
+
+      <NoticesComponents
+        v-if="param === 'notices'"
+        :notices="notices"
+        :isLoading="isLoading"
+        :noData="noData"
+        :currentPage="noticeQuery.page"
+        :totalPages="noticePagination.pages"
+        @changePage="changeNoticePage"
+        @goTo="goTo($event)"
+        @searchData="searchData($event)"
+        @apiSwitch="switchNotice($event)"
+        @apiDelete="deleteNotice($event)"
+      />
     </div>
   </div>
 </template>
@@ -65,6 +79,7 @@
 <script>
 import FieldMapComponents from '@/components/config/FieldMap.components.vue'
 import InfrabooksComponents from '@/components/config/Infrabooks.components.vue'
+import NoticesComponents from '@/components/config/Notices.components.vue'
 import OverrideComponents from '@/components/config/Override.components.vue'
 import ProductsComponents from '@/components/config/Products.components.vue'
 import StandaloneComponents from '@/components/config/Standalone.components.vue'
@@ -82,10 +97,20 @@ export default {
       infrabooks: [],
       standalone: [],
       override: [],
+      notices: [],
       allProducts: [],
       allInfrabooks: [],
       allStandalone: [],
       allOverride: [],
+      allNotices: [],
+      noticeQuery: {
+        page: 1,
+        paginate: 5,
+      },
+      noticePagination: {
+        pages: 0,
+        total: 0,
+      },
       searchValue: '',
       noData: false,
     }
@@ -97,6 +122,7 @@ export default {
     StandaloneComponents,
     OverrideComponents,
     FieldMapComponents,
+    NoticesComponents,
   },
   mounted() {
     switch (true) {
@@ -115,6 +141,9 @@ export default {
       case this.param === 'fieldmap':
         this.fetchDataFieldMaps()
         break
+      case this.param === 'notices':
+        this.fetchDataNotices()
+        break
       default:
         null
     }
@@ -124,7 +153,14 @@ export default {
       this.$router.back()
     },
     goTo(param) {
-      // console.log(param)
+      if (param && typeof param === 'object') {
+        this.$router.push({
+          name: 'form',
+          params: { path: this.param, uuid: param.id },
+          state: { notice: JSON.parse(JSON.stringify(param)) },
+        })
+        return
+      }
       this.$router.push({ name: 'form', params: { path: this.param, uuid: param } })
     },
     searchData(value) {
@@ -139,6 +175,9 @@ export default {
             return
           case this.param === 'standalone':
             this.standalone = this.allStandalone.slice()
+            return
+          case this.param === 'notices':
+            this.notices = this.allNotices.slice()
             return
           default:
             return
@@ -157,6 +196,17 @@ export default {
             String(p?.name ?? '')
               .toLowerCase()
               .includes(q),
+          )
+          break
+        case this.param === 'notices':
+          this.notices = this.allNotices.filter(
+            (n) =>
+              String(n?.captions ?? '')
+                .toLowerCase()
+                .includes(q) ||
+              String(n?.type ?? '')
+                .toLowerCase()
+                .includes(q),
           )
           break
         default:
@@ -276,6 +326,73 @@ export default {
     },
     fetchDataFieldMaps() {
       this.title = 'Config FieldMap Menu'
+    },
+    fetchDataNotices() {
+      this.title = 'Config Notices'
+      this.isLoading = true
+      this.noData = false
+      apiServices
+        .getNotices(this.noticeQuery)
+        .then((res) => {
+          this.isLoading = false
+          const raw = res.data?.data ?? res.data
+          const list = Array.isArray(raw)
+            ? raw
+            : Array.isArray(raw?.docs)
+              ? raw.docs
+              : raw && typeof raw === 'object' && raw.id
+                ? [raw]
+                : []
+          this.noticePagination = {
+            pages: raw?.pages ?? (list.length > 0 ? 1 : 0),
+            total: raw?.total ?? list.length,
+          }
+          this.allNotices = list
+          this.notices = list.slice()
+        })
+        .catch((e) => {
+          this.isLoading = false
+          if (e.response?.data?.status === 404 || e.response?.status === 404) {
+            this.noData = true
+          } else {
+            const status = e.response?.data?.status || e.response?.status || 500
+            const msg = e.response?.data?.message || e.response?.data?.resp || e.message
+            this.$toast.error(`Error : ${status} - ${msg}`)
+          }
+        })
+    },
+    changeNoticePage(page) {
+      this.noticeQuery.page = page
+      this.fetchDataNotices()
+    },
+    switchNotice(item) {
+      apiServices
+        .switchNotice({ id: item.id, isActive: !item.isActive })
+        .then(() => {
+          this.$toast.success('Successfully updated notice status')
+          this.fetchDataNotices()
+        })
+        .catch((e) => {
+          const status = e.response?.data?.status || e.response?.status || 500
+          const msg = e.response?.data?.message || e.response?.data?.resp || e.message
+          this.$toast.error(`Error : ${status} - ${msg}`)
+        })
+    },
+    deleteNotice(id) {
+      const confrm = confirm('Apakah yakin akan menghapus notice ini?')
+      if (confrm) {
+        apiServices
+          .deleteNotice(id)
+          .then(() => {
+            this.$toast.success('Successfully deleted notice')
+            this.fetchDataNotices()
+          })
+          .catch((e) => {
+            const status = e.response?.data?.status || e.response?.status || 500
+            const msg = e.response?.data?.message || e.response?.data?.resp || e.message
+            this.$toast.error(`Error : ${status} - ${msg}`)
+          })
+      }
     },
   },
 }

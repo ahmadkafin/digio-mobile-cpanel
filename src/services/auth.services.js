@@ -3,6 +3,17 @@ import { API_ENDPOINTS } from '@/utils/endpoint.utils';
 
 class AuthService {
     async login(user) {
+        const env = import.meta.env.VITE_APP_ENVIRONMENT;
+        if (env === 'DEV' || env === 'STAG') {
+            const data = {
+                token: user.token.trim(),
+                username: user.username,
+                directory: user.directory,
+            };
+            localStorage.setItem('userdata', JSON.stringify(data));
+            return data;
+        }
+
         return await axios.post(API_ENDPOINTS.login, {
             username: user.username,
             password: user.password,

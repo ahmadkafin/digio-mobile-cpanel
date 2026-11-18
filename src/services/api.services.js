@@ -132,7 +132,7 @@ class ApiService {
         return axios.get(URL + '/products/video/categories', { headers: requestHeader('products-video') });
     }
 
-    fetchVideoFeed(query, videoName) {
+    fetchVideoFeed(query, videoName = '') {
         let q = `page=${query.page}&paginate=${query.paginate}&orderBy=${query.orderBy}&sortBy=${query.sortBy}&productId=${query.productId}&videoname=${videoName}`
         return axios.get(URL + '/products/video/feed?' + q, { headers: requestHeader('products-video') });
     }
@@ -147,6 +147,33 @@ class ApiService {
 
     deleteVideo(id) {
         return axios.delete(URL + `/products/video/${id}`, { headers: requestHeader('add-video') });
+    }
+
+    // notices
+    getNotices(query = { page: 1, paginate: 5 }) {
+        const page = query?.page ?? 1;
+        const paginate = query?.paginate ?? 5;
+        return axios.get(`${URL}/notice/panel?page=${page}&paginate=${paginate}`, { headers: requestHeader('notice') });
+    }
+
+    createNotice(data) {
+        return axios.post(URL + '/notice', data, { headers: requestHeader('notice') });
+    }
+
+    updateNotice(data) {
+        return axios.patch(URL + '/notice', data, { headers: requestHeader('notice') });
+    }
+
+    switchNotice(data) {
+        return axios.patch(URL + '/notice/switch', data, { headers: requestHeader('notice') });
+    }
+
+    deleteNotice(id) {
+        return axios.delete(URL + '/notice', {
+            headers: requestHeader('notice'),
+            data: { id },
+            params: { id },
+        });
     }
 
 

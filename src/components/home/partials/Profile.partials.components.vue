@@ -41,6 +41,15 @@
               <font-awesome-icon :icon="['fas', 'chevron-right']" />
             </button>
 
+            <button
+              class="btn btn-primary btn-sm"
+              @click="goToPage(item.path)"
+              v-if="item.type == 'page'"
+            >
+              Open
+              <font-awesome-icon :icon="['fas', 'chevron-right']" />
+            </button>
+
             <div
               class="btn-group"
               role="group"
@@ -88,6 +97,7 @@ export default {
     }
   },
   mounted() {
+    this.buildDataCard()
     this.getInit()
   },
   methods: {
@@ -129,7 +139,18 @@ export default {
           type: 'checkbox',
           model: this.isMaintenance,
         },
+        {
+          name: 'Notices',
+          description: 'Use this to manage app notices, banners, and call-to-action targets.',
+          color: '#4E598C',
+          images: 'new_icon_new_font',
+          path: 'notices',
+          type: 'page',
+        },
       ]
+    },
+    goToPage(path) {
+      this.$router.push({ name: 'config', params: { path } })
     },
 
     changeToServer(item) {
